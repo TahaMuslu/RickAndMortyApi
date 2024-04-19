@@ -1,0 +1,45 @@
+version: "3.4"
+
+name: rickandmorty
+
+networks:
+  rickandmorty:
+    driver: bridge
+
+services:
+  # rickandmorty-service:
+  #   depends_on:
+  #     - rickandmorty-db
+  #   container_name: rickandmorty-service
+  #   restart: on-failure
+  #   ports:
+  #     - "127.0.0.1:31260:80"
+  #     - "127.0.0.1:31261:443"
+  #   build:
+  #     context: .
+  #     dockerfile: ./Api/Dockerfile
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Docker
+  #     - ASPNETCORE_URLS=https://+:443;https://+:80
+  #   networks:
+  #     - rickandmorty
+  #   links:
+  #     - rickandmorty-db
+
+  rickandmorty-db:
+    image: mcr.microsoft.com/mssql/server:latest
+    working_dir: /usr/src/app
+    volumes:
+      - ./Db:/usr/src/app
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Admin123
+      - MSSQL_PID=Express
+    command: "/bin/bash ./entrypoint.sh"
+    container_name: rickandmorty-db
+    ports:
+      - "1433:1433"
+    restart: always
+    networks:
+      - rickandmorty
+    hostname: "rickandmorty-db"

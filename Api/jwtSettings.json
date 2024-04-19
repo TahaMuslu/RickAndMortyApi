@@ -1,0 +1,10 @@
+{
+    "Jwt": {
+      "Key": "EsRZC9Swdv3AeWtohwfvQ8Qy2wxRSyLfDhO31E1s",
+      "Issuer": "Apposite",
+      "Audience": "Apposite",
+      "Subject": "Apposite",
+      "Ttl": 259200,
+      "RefreshTtl": 518400
+    }
+}
