@@ -1,14 +1,15 @@
-﻿using Apposite.Core.Entity;
-using Apposite.Domain.Entities;
+﻿using Core.Entity;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
-namespace Apposite.Persistence
+namespace Persistence
 {
     public class RickAndMortyDbContext : DbContext
     {
         // Migration commands
-        // cd .\Apposite.Persistence\
-        // dotnet ef --startup-project ..\Apposite.Api\ migrations add <migration-name>
+        // cd .\Persistence\
+        // dotnet ef --startup-project ..\Api\ migrations add <migration-name>
         // dotnet ef database update
         public RickAndMortyDbContext(DbContextOptions<RickAndMortyDbContext> options) : base(options)
         {
@@ -19,11 +20,43 @@ namespace Apposite.Persistence
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<User>().ToTable("User");
+            builder.Entity<User>()
+                .ToTable("Users")
+                .Property(u => u.Id)
+            .ValueGeneratedOnAdd();
+
+            builder.Entity<Character>(entity =>
+            {
+                entity.ToTable("Characters");
+
+                entity.Property(c => c.Id).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.Origin)
+                      .WithMany()
+                      .HasForeignKey("OriginId")
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.Location)
+                      .WithMany(l => l.Characters)
+                      .HasForeignKey("LocationId")
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Location>()
+                .ToTable("Locations")
+                .Property(l => l.Id)
+                .ValueGeneratedOnAdd();
+
+            builder.Entity<Episode>()
+                .ToTable("Episodes")
+                .Property(e => e.Id)
+                .ValueGeneratedOnAdd();
         }
 
         public DbSet<User> Users { get; set; }
-        
+        public DbSet<Character> Characters { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Episode> Episodes { get; set; }
 
         public override int SaveChanges()
         {
@@ -52,6 +85,7 @@ namespace Apposite.Persistence
                 if (entity.State == EntityState.Modified)
                     ((BaseEntity)entity.Entity).UpdatedAt = now;
             }
+
         }
     }
 }
