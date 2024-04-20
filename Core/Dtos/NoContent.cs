@@ -1,4 +1,4 @@
-﻿namespace Apposite.Core.Dtos
+﻿namespace Core.Dtos
 {
     public class NoContent
     {

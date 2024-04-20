@@ -1,29 +1,19 @@
-using Apposite.Application.Services;
-using Apposite.Application.Settings;
-using Apposite.Domain.Entities;
-using Apposite.Persistence;
-using Microsoft.AspNetCore.Identity;
+using Application.Middleware;
+using Application.Services;
+using Persistence;
+using Persistence.Seeds;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System.Data;
+using System.Text;
+using Application.Settings;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("jwtSettings.json");
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
-
-
-builder.Services.AddDbContext<RickAndMortyDbContext>(options =>
-{
-    options.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionString") ?? builder.Configuration.GetConnectionString("localDb"));
-});
-
-builder.Services.AddLogging().AddSerilog();
-Apposite.Application.ServiceExtensions.LoggerExtensions.ConfigureLogging();
-
-Log.Information("Logger Started");
 
 builder.Services.AddDbContext<RickAndMortyDbContext>(options =>
 {
@@ -31,31 +21,34 @@ builder.Services.AddDbContext<RickAndMortyDbContext>(options =>
 });
 
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters.RoleClaimType = "role";
-    options.TokenValidationParameters = new TokenValidationParameters()
+builder.Services.AddLogging().AddSerilog();
+Application.ServiceExtensions.LoggerExtensions.ConfigureLogging();
+
+Log.Information("Logger Started");
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-        ValidateLifetime = true
-    };
-});
-builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromMinutes(30));
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+
+
 
 builder.Services.AddScoped<JwtGenerator>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(setup =>
 {
@@ -83,8 +76,8 @@ builder.Services.AddSwaggerGen(setup =>
     });
 }
 );
-builder.Services.AddMediatR(typeof(AuthCommandHandler));
 builder.Services.ExternalServices();
+builder.Services.AddHttpContextAccessor();
 
 
 // cors
@@ -110,13 +103,34 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-//if (app.Environment.IsDevelopment())
-//{
+using (var migrationSvcScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+{
+    try
+    {
+        var context = migrationSvcScope.ServiceProvider.GetService<RickAndMortyDbContext>().Database;
+        var migrations = context.GetPendingMigrations();
+        await context.MigrateAsync();
+    }
+    catch (Exception)
+    {
+
+    }
+}
+
+AdminSeed.SeedAdmin(app.Services).Wait();
+
+app.UseMiddleware<CustomExceptionHandler>();
+
+
+if (app.Environment.IsDevelopment() || true)
+{
     app.UseSwagger();
     app.UseSwaggerUI();
-//}
+}
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
 
 app.UseAuthorization();
 

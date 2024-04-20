@@ -1,4 +1,4 @@
-﻿namespace Apposite.Core.Pagination
+﻿namespace Core.Pagination
 {
     public class Pager
     {

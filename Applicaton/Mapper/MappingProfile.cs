@@ -6,7 +6,7 @@ namespace Persistence.Mapper
     {
         public MappingProfile()
         {
-            CreateMap<UserSummaryDto, User>().ReverseMap();
+            //CreateMap<UserSummaryDto, User>().ReverseMap();
         }
     }
 

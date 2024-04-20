@@ -1,8 +1,8 @@
-﻿using Apposite.Core.Dtos;
+﻿using Core.Dtos;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
-namespace Apposite.Application.Middleware
+namespace Application.Middleware
 {
     public class CustomExceptionHandler
     {
@@ -17,7 +17,7 @@ namespace Apposite.Application.Middleware
             {
 
                 Log.Information($"Request {httpContext.Request.Path} is called ");
-                await _next(httpContext); // gelen datayı da logla
+                await _next(httpContext);
                 Log.Information($"Request {httpContext.Request.Method} {httpContext.Request.Path} => {httpContext.Response.StatusCode} is finished");
             }
             catch (Exception ex)
@@ -32,7 +32,7 @@ namespace Apposite.Application.Middleware
 
             if (ex is UnauthorizedAccessException)
             {
-                //responseModel.Message = ResponseMessage.unauthorized.ToString();
+                responseModel.Messages = new List<string> { "Unauthorized Access" };
                 responseModel.StatusCode = 401;
                 Log.Error(ex,$"Unauthorized Access: {ex.Message}  - - " +
                                  $"Request  {httpContext.Request.Method} {httpContext.Request.Path}");

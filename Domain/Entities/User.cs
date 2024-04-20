@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Core.Entity;
 using Microsoft.AspNetCore.Identity;
 
-namespace Apposite.Domain.Entities
+namespace Domain.Entities
 {
-    public class User : IdentityUser<Guid>
+    public class User : BaseEntity
     {
         [Required]
         public string Name { get; set; }
         [Required]
-        public string Surname { get; set; }
-        public string FullName => $"{Name} {Surname}";
-        public bool IsDeleted { get; set; } 
+        public string Email { get; set; }
+        [Required]
+        public string Password { get; set; }
     }
 }
 

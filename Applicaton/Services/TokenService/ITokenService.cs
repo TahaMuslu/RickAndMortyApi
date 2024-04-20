@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Apposite.Application.Services.TokenService
+namespace Application.Services.TokenService
 {
     public interface ITokenService
     {
-
         public Guid GetUserId();
 
     }

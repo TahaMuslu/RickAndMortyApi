@@ -1,4 +1,4 @@
-﻿namespace Apposite.Application.Settings
+﻿namespace Application.Settings
 {
     public class JwtSettings
     {

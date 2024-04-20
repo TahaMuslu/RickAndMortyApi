@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Apposite.Core.Pagination;
+using Core.Pagination;
 
-namespace Apposite.Core.Dtos
+namespace Core.Dtos
 {
     public class Response<T>
     {
@@ -17,8 +17,6 @@ namespace Apposite.Core.Dtos
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Pager? Pagination { get; set; }
 
-        //[JsonIgnore]
-        //public bool IsSuccessful { get; set; }
 
         // Static Factory Methods
         public static Response<T> Success(int statusCode)

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace Apposite.Application.ServiceExtensions
+namespace Application.ServiceExtensions
 {
     public static class LoggerExtensions
     {

@@ -1,6 +1,6 @@
-using Apposite.Core.Pagination;
+using Core.Pagination;
 
-namespace Apposite.Application.ServiceExtensions
+namespace Application.ServiceExtensions
 {
     public static class PaginationExtension
     {
