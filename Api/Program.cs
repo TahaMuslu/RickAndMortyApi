@@ -9,6 +9,9 @@ using Serilog;
 using System.Text;
 using Application.Settings;
 using Microsoft.IdentityModel.Tokens;
+using Persistence.Mapper;
+using Applicaton.Settings;
+using Core.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,8 +51,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 
 builder.Services.AddScoped<JwtGenerator>();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+
 builder.Services.AddSwaggerGen(setup =>
 {
     var jwtSecurityScheme = new OpenApiSecurityScheme
@@ -119,6 +125,7 @@ using (var migrationSvcScope = app.Services.GetRequiredService<IServiceScopeFact
 
 AdminSeed.SeedAdmin(app.Services).Wait();
 
+
 app.UseMiddleware<CustomExceptionHandler>();
 
 
@@ -131,6 +138,21 @@ if (app.Environment.IsDevelopment() || true)
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(Response<NoContent>.Fail(404, "Not Found"));
+    }else if(context.Response.StatusCode == 401 && !context.Response.HasStarted)
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(Response<NoContent>.Fail(401, "Unauthorized"));
+    }
+});
 
 app.UseAuthorization();
 

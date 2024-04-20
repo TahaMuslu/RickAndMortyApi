@@ -2,6 +2,13 @@
 {
     public class Pager
     {
+        public Pager(decimal pageNumber, decimal pageSize, decimal totalRecords)
+        {
+            PageNumber = pageNumber;
+            PageSize = pageSize;
+            TotalRecords = totalRecords;
+        }
+
         public decimal PageNumber { get; set; }
         public decimal PageSize { get; set; }
         public decimal TotalPages

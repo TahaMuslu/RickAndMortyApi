@@ -6,6 +6,9 @@ namespace Core.Dtos
     public class Response<T>
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Pager? Pagination { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public T? Data { get; set; }
 
         [JsonIgnore]
@@ -13,9 +16,6 @@ namespace Core.Dtos
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string>? Messages { get; set; }
-
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public Pager? Pagination { get; set; }
 
 
         // Static Factory Methods

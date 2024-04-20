@@ -1,4 +1,5 @@
-﻿using Core.Dtos;
+﻿using Applicaton.Settings;
+using Core.Dtos;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
@@ -15,7 +16,7 @@ namespace Application.Middleware
         {
             try
             {
-
+                UrlSettings.BaseUrl = httpContext.Request.Scheme + "://" + httpContext.Request.Host.Value;
                 Log.Information($"Request {httpContext.Request.Path} is called ");
                 await _next(httpContext);
                 Log.Information($"Request {httpContext.Request.Method} {httpContext.Request.Path} => {httpContext.Response.StatusCode} is finished");

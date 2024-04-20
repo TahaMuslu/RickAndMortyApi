@@ -7,24 +7,24 @@ networks:
     driver: bridge
 
 services:
-  # rickandmorty-service:
-  #   depends_on:
-  #     - rickandmorty-db
-  #   container_name: rickandmorty-service
-  #   restart: on-failure
-  #   ports:
-  #     - "127.0.0.1:31260:80"
-  #     - "127.0.0.1:31261:443"
-  #   build:
-  #     context: .
-  #     dockerfile: ./Api/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Docker
-  #     - ASPNETCORE_URLS=https://+:443;https://+:80
-  #   networks:
-  #     - rickandmorty
-  #   links:
-  #     - rickandmorty-db
+  rickandmorty-service:
+    depends_on:
+      - rickandmorty-db
+    container_name: rickandmorty-service
+    restart: on-failure
+    ports:
+      - "127.0.0.1:31260:80"
+      - "127.0.0.1:31261:443"
+    build:
+      context: .
+      dockerfile: ./Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+    networks:
+      - rickandmorty
+    links:
+      - rickandmorty-db
 
   rickandmorty-db:
     image: mcr.microsoft.com/mssql/server:latest

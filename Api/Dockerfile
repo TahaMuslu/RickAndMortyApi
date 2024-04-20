@@ -8,17 +8,21 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["RickAndMorty/RickAndMorty.csproj", "RickAndMorty/"]
-RUN dotnet restore "./RickAndMorty/RickAndMorty.csproj"
+COPY ["Api/Api.csproj", "Api/"]
+COPY ["Applicaton/Applicaton.csproj", "Applicaton/"]
+COPY ["Persistence/Persistence.csproj", "Persistence/"]
+COPY ["Core/Core.csproj", "Core/"]
+COPY ["Domain/Domain.csproj", "Domain/"]
+RUN dotnet restore "./Api/Api.csproj"
 COPY . .
-WORKDIR "/src/RickAndMorty"
-RUN dotnet build "./RickAndMorty.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/Api"
+RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./RickAndMorty.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RickAndMorty.dll"]
+ENTRYPOINT ["dotnet", "Api.dll"]

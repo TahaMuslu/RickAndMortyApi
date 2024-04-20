@@ -21,15 +21,11 @@ namespace Persistence
             base.OnModelCreating(builder);
 
             builder.Entity<User>()
-                .ToTable("Users")
-                .Property(u => u.Id)
-            .ValueGeneratedOnAdd();
+                .ToTable("Users");
 
             builder.Entity<Character>(entity =>
             {
                 entity.ToTable("Characters");
-
-                entity.Property(c => c.Id).ValueGeneratedOnAdd();
 
                 entity.HasOne(d => d.Origin)
                       .WithMany()
@@ -37,20 +33,16 @@ namespace Persistence
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(d => d.Location)
-                      .WithMany(l => l.Characters)
+                      .WithMany(l => l.Residents)
                       .HasForeignKey("LocationId")
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<Location>()
-                .ToTable("Locations")
-                .Property(l => l.Id)
-                .ValueGeneratedOnAdd();
+                .ToTable("Locations");
 
             builder.Entity<Episode>()
-                .ToTable("Episodes")
-                .Property(e => e.Id)
-                .ValueGeneratedOnAdd();
+                .ToTable("Episodes");
         }
 
         public DbSet<User> Users { get; set; }
