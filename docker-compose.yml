@@ -14,7 +14,6 @@ services:
     restart: on-failure
     ports:
       - "127.0.0.1:31260:80"
-      - "127.0.0.1:31261:443"
     build:
       context: .
       dockerfile: ./Api/Dockerfile
@@ -36,6 +35,7 @@ services:
       - SA_PASSWORD=Admin123
       - MSSQL_PID=Express
     command: "/bin/bash ./entrypoint.sh"
+    # command: bash -c "/opt/mssql/bin/sqlservr & sleep 20 && /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Admin123 -Q 'CREATE DATABASE [rickandmorty-db];'"
     container_name: rickandmorty-db
     ports:
       - "1433:1433"

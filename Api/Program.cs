@@ -124,6 +124,7 @@ using (var migrationSvcScope = app.Services.GetRequiredService<IServiceScopeFact
 }
 
 AdminSeed.SeedAdmin(app.Services).Wait();
+AllSeed.SeedAll(app.Services).Wait();
 
 
 app.UseMiddleware<CustomExceptionHandler>();
